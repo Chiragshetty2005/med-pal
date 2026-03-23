@@ -1,52 +1,37 @@
 /**
- * Mock LLM Service for Med-Pal MVP
+ * Analyze Service (Orchestrator)
+ * Ties together the 3-Layer Architecture: Pre-processing, AI Reasoning, Post-processing
  */
 
+const { preprocess } = require('../layers/preprocessing');
+const { aiReasoning } = require('../layers/ai_reasoning');
+const { applySafetyOverrides } = require('../layers/postprocessing');
+
 const analyzePatient = async (patientData) => {
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
+  try {
+    // 1. Pre-Processing (Clean data, flag anomalies)
+    const cleanData = preprocess(patientData);
 
-  const { symptoms, age, hr, spo2, temp } = patientData;
+    // 2. AI Reasoning (LLM generation based on clean context)
+    const aiResult = await aiReasoning(cleanData);
 
-  // Simple rule-based mock for MVP simulation
-  let severity = 'Safe'; // Safe, Warning, Emergency
-  let color = 'Green';
-  let riskScore = 10;
-  let emergencyAlert = false;
-  let conditions = ['Healthy adult'];
-  let recommendations = ['Rest', 'Drink water'];
-  
-  if (temp > 102 || spo2 < 90 || hr > 120 || (symptoms && symptoms.toLowerCase().includes('chest pain'))) {
-    severity = 'Emergency';
-    color = 'Red';
-    riskScore = 95;
-    emergencyAlert = true;
-    conditions = ['Possible Myocardial Infarction', 'Severe Hypoxemia'];
-    recommendations = ['Call emergency services immediately', 'Do not drive yourself to hospital'];
-  } else if (temp > 99.5 || hr > 100 || (symptoms && symptoms.toLowerCase().includes('cough'))) {
-    severity = 'Warning';
-    color = 'Yellow';
-    riskScore = 45;
-    conditions = ['Viral Infection', 'Mild Dehydration'];
-    recommendations = ['Monitor temperature', 'Rest and hydrate', 'Consult physician if symptoms persist'];
-  } else {
-    severity = 'Safe';
-    color = 'Green';
-    riskScore = 15;
-    conditions = ['No immediate life-threatening conditions identified'];
-    recommendations = ['Maintain healthy lifestyle', 'Routine follow-up'];
+    // 3. Post-Processing & Safety Rules (Enforce strict clinic rules)
+    const finalResult = applySafetyOverrides(aiResult, cleanData);
+
+    return finalResult;
+  } catch (error) {
+    console.error("Central Analyze Service Error:", error);
+    // Return a safe fallback on total systemic failure
+    return {
+      Severity: "Unknown",
+      PossibleConditions: ["System Error Processing Data"],
+      Recommendations: ["Seek clinical evaluation directly, system currently impaired"],
+      Color: "Yellow",
+      RiskScore: 50,
+      EmergencyAlert: false,
+      Timestamp: new Date().toISOString()
+    };
   }
-
-  // Build the structured JSON response
-  return {
-    PossibleConditions: conditions,
-    Severity: severity,
-    Color: color,
-    EmergencyAlert: emergencyAlert,
-    RiskScore: riskScore,
-    Recommendations: recommendations,
-    Timestamp: new Date().toISOString()
-  };
 };
 
 module.exports = { analyzePatient };
