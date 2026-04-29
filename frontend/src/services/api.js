@@ -1,13 +1,16 @@
 // src/services/api.js
 const API_URL = 'http://localhost:5000';
 
-export async function analyzePatientData(data) {
+export async function analyzePatientData(data, token = null) {
   try {
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${API_URL}/analyze`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify(data),
     });
 

@@ -1,0 +1,14 @@
+Status: 200
+
+{
+  "prediction": "Normal Chest X-ray",
+  "confidence": 0.9,
+  "type": "X-ray",
+  "explanation": "The X-ray result shows that the chest area appears to be normal. This means that the lungs look clear and healthy, the heart is the right size and shape, and there are no signs of broken bones in the chest. This is a good sign, but it's always important to consult a doctor to confirm the results and discuss what they mean for your health.",
+  "severity": "Low",
+  "next_steps": [
+    "Consult a doctor to confirm the results",
+    "Discuss any symptoms or concerns you have with your doctor",
+    "Follow up with any additional tests or appointments recommended by your doctor"
+  ]
+}

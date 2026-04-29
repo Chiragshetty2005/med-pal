@@ -30,24 +30,31 @@ The JSON MUST follow this schema exactly:
 const callRealLLM = async (cleanData) => {
   const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
   
+  // Build vitals string — only include values that were actually provided
+  const vitalParts = [];
+  if (cleanData.hr !== null)   vitalParts.push(`HR ${cleanData.hr} bpm`);
+  if (cleanData.spo2 !== null) vitalParts.push(`SpO2 ${cleanData.spo2}%`);
+  if (cleanData.temp !== null) vitalParts.push(`Temp ${cleanData.temp}°F`);
+  if (cleanData.bp)            vitalParts.push(`BP ${cleanData.bp}`);
+  const vitalsStr = vitalParts.length > 0 ? vitalParts.join(', ') : 'Not provided';
+
   const userPrompt = `Patient Profile:
 Age/Gender: ${cleanData.age} ${cleanData.gender}
 History: ${cleanData.history}
 Symptoms: ${cleanData.symptoms}
-Vitals: HR ${cleanData.hr}, SpO2 ${cleanData.spo2}%, Temp ${cleanData.temp}F, BP ${cleanData.bp}
+Vitals: ${vitalsStr}
 
 Detected Flags: ${JSON.stringify(cleanData.flags)}
 Please analyze.`;
 
   try {
     const response = await groq.chat.completions.create({
-      model: 'groq/compound', // Using Groq's Compound system as requested
+      model: 'llama-3.3-70b-versatile',
       messages: [
         { role: 'system', content: buildSystemPrompt() },
         { role: 'user', content: userPrompt }
       ],
       temperature: 0.2, // Low temperature for deterministic medical reasoning
-      response_format: { type: 'json_object' } // Enforce JSON format at the API level
     });
 
     const content = response.choices[0].message.content;

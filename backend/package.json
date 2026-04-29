@@ -11,10 +11,16 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "form-data": "^4.0.5",
     "groq-sdk": "^1.1.1",
-    "openai": "^6.32.0"
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.1.1",
+    "openai": "^6.32.0",
+    "pdfkit": "^0.18.0",
+    "uuid": "^14.0.0"
   }
 }

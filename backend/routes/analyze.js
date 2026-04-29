@@ -5,6 +5,7 @@ const llmService = require('../services/llm');
 router.post('/', async (req, res) => {
   try {
     const { symptoms, age, gender, history, hr, bp, spo2, temp } = req.body;
+    console.log('[/analyze] Received:', { symptoms, age, gender, history, hr, bp, spo2, temp });
     
     // Process input using LLM mock
     const analysisResult = await llmService.analyzePatient({

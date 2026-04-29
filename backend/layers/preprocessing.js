@@ -4,6 +4,10 @@
  * Acts as the strict first line of defense before AI reasoning.
  */
 
+// Safe parsers — return null for absent/invalid values instead of NaN
+const safeInt = (v) => { const n = parseInt(v); return isNaN(n) ? null : n; };
+const safeFloat = (v) => { const n = parseFloat(v); return isNaN(n) ? null : n; };
+
 const preprocess = (rawData) => {
   const { symptoms, age, gender, history, hr, bp, spo2, temp } = rawData;
 
@@ -13,9 +17,9 @@ const preprocess = (rawData) => {
     gender: String(gender || 'Unknown').trim(),
     history: String(history || 'None').trim(),
     symptoms: String(symptoms || '').trim().toLowerCase(),
-    hr: parseInt(hr),
-    spo2: parseInt(spo2),
-    temp: parseFloat(temp),
+    hr: safeInt(hr),
+    spo2: safeInt(spo2),
+    temp: safeFloat(temp),
     bp: String(bp || '').trim() // format e.g., '120/80'
   };
 
